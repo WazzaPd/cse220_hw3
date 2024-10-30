@@ -68,7 +68,7 @@ Image *load_image(char *filename) {
         fgets(c, 2, fp);
     }
 
-    char widthS[4] = {0};
+    char widthS[5] = {0};
     int i = 0;
     while (c[0] != ' ' && i < 3) {
         widthS[i++] = c[0];
@@ -76,7 +76,8 @@ Image *load_image(char *filename) {
     }
     widthS[i] = '\0';
 
-    char heightS[4] = {0};
+    fgets(c, 2, fp);
+    char heightS[5] = {0};
     i = 0;
     while (c[0] != '\n' && i < 3) {
         heightS[i++] = c[0];
@@ -107,7 +108,7 @@ Image *load_image(char *filename) {
 
     // handle body
     while (fgets(c, 2, fp)) {
-        if (c[0] == ' ' || c[0] == '\n') {
+        if (c[0] == ' ') {
             num[numIndex] = '\0';
             int intensity = atoi(num);
             numIndex = 0;
