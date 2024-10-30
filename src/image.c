@@ -42,88 +42,181 @@ void insertColor(Image * p, Color * color, int intensity, int colorArrayIndex){
 
 Image *load_image(char *filename) {    
     FILE *fp = fopen(filename, "r");
-
-    Image *p = malloc(sizeof(Image));
-
-    if(fp == NULL){
+    if (fp == NULL) {
         perror("error opening file");
         return NULL;
     }
+
+    Image *p = malloc(sizeof(Image));
+    if (p == NULL) {
+        fclose(fp);
+        return NULL;
+    }
+    p->red = p->green = p->blue = NULL;  // Initialize to NULL
 
     int bufferSize = 13;
     char buffer[bufferSize];
     char c[2];
 
-    //handle header
+    // handle header
     fgets(buffer, bufferSize, fp);  // p3
     fgets(c, 2, fp);
-    while(c[0] == '#'){     // eliminate comments
-        do{
+    while (c[0] == '#') {
+        do {
             fgets(c, 2, fp);
-        }
-        while(c[0] != '\n');
+        } while (c[0] != '\n');
         fgets(c, 2, fp);
     }
-    char widthS[4];         // max of 3 digits width
+
+    char widthS[4] = {0};
     int i = 0;
-    while (c[0] != ' '){
-        widthS[i] = c[0];
-        i ++;
+    while (c[0] != ' ' && i < 3) {
+        widthS[i++] = c[0];
         fgets(c, 2, fp);
     }
+    widthS[i] = '\0';
 
-    fgets(c, 2, fp);
-    char heightS[4];         // max of 3 digits height
+    char heightS[4] = {0};
     i = 0;
-    while (c[0] != '\n'){
-        heightS[i] = c[0];
-        i ++;
+    while (c[0] != '\n' && i < 3) {
+        heightS[i++] = c[0];
         fgets(c, 2, fp);
     }
-    p->width = atoi(widthS);
-    p->height = atoi(heightS);
-    p->red = malloc(sizeof(char) * p->width * p->height);
-    p->green = malloc(sizeof(char) * p->width * p->height);
-    p->blue = malloc(sizeof(char) * p->width * p->height);
+    heightS[i] = '\0';
 
-    fgets(buffer, bufferSize, fp);   // max intensity 255
+    p->width = (unsigned short)atoi(widthS);
+    p->height = (unsigned short)atoi(heightS);
+
+    p->red = malloc(sizeof(unsigned char) * p->width * p->height);
+    p->green = malloc(sizeof(unsigned char) * p->width * p->height);
+    p->blue = malloc(sizeof(unsigned char) * p->width * p->height);
+
+    if (p->red == NULL || p->green == NULL || p->blue == NULL) {
+        free(p->red); free(p->green); free(p->blue);  // Free any allocated arrays
+        free(p);
+        fclose(fp);
+        return NULL;
+    }
+
+    fgets(buffer, bufferSize, fp);  // max intensity 255
 
     Color currentColor = RED;
-    char num[4];
+    char num[4] = {0};
     int numIndex = 0;
     int colorArrayIndex = 0;
 
-    //handle Body
-    while (fgets(c, 2, fp)){
-        if(c[0] == ' ' || c[0] == '\n'){
+    // handle body
+    while (fgets(c, 2, fp)) {
+        if (c[0] == ' ' || c[0] == '\n') {
             num[numIndex] = '\0';
             int intensity = atoi(num);
             numIndex = 0;
             insertColor(p, &currentColor, intensity, colorArrayIndex);
 
             nextColor(&currentColor);
-            if(currentColor == RED){
-                colorArrayIndex ++;
+            if (currentColor == RED) {
+                colorArrayIndex++;
             }
             continue;
         }
-        num[numIndex] = c[0];
-        numIndex ++;
+        num[numIndex++] = c[0];
     }
 
-    // for(int j = 0; j < (p->width * p->height); j++){
-    //     printf( "%d %d %d\n", (int)p->red[j], (int)p->green[j], (int)p->blue[j]);
-    // }
-
+    fclose(fp);
     return p;
 }
 
+// Image *load_image(char *filename) {    
+//     FILE *fp = fopen(filename, "r");
+
+//     Image *p = malloc(sizeof(Image));
+
+//     if(fp == NULL){
+//         perror("error opening file");
+//         return NULL;
+//     }
+
+//     int bufferSize = 13;
+//     char buffer[bufferSize];
+//     char c[2];
+
+//     //handle header
+//     fgets(buffer, bufferSize, fp);  // p3
+//     fgets(c, 2, fp);
+//     while(c[0] == '#'){     // eliminate comments
+//         do{
+//             fgets(c, 2, fp);
+//         }
+//         while(c[0] != '\n');
+//         fgets(c, 2, fp);
+//     }
+//     char widthS[4];         // max of 3 digits width
+//     int i = 0;
+//     while (c[0] != ' '){
+//         widthS[i] = c[0];
+//         i ++;
+//         fgets(c, 2, fp);
+//     }
+//     widthS[i] = '\0';
+
+//     fgets(c, 2, fp);
+//     char heightS[4];         // max of 3 digits height
+//     i = 0;
+//     while (c[0] != '\n'){
+//         heightS[i] = c[0];
+//         i ++;
+//         fgets(c, 2, fp);
+//     }
+//     heightS[i] = '\0';
+//     p->width = (unsigned short) atoi(widthS);
+//     p->height = (unsigned short) atoi(heightS);
+//     p->red = malloc(sizeof(unsigned char) * p->width * p->height);
+//     p->green = malloc(sizeof(unsigned char) * p->width * p->height);
+//     p->blue = malloc(sizeof(unsigned char) * p->width * p->height);
+
+//     fgets(buffer, bufferSize, fp);   // max intensity 255
+
+//     Color currentColor = RED;
+//     char num[4];
+//     int numIndex = 0;
+//     int colorArrayIndex = 0;
+
+//     //handle Body
+//     while (fgets(c, 2, fp)){
+//         if(c[0] == ' ' || c[0] == '\n'){
+//             num[numIndex] = '\0';
+//             int intensity = atoi(num);
+//             numIndex = 0;
+//             insertColor(p, &currentColor, intensity, colorArrayIndex);
+
+//             nextColor(&currentColor);
+//             if(currentColor == RED){
+//                 colorArrayIndex ++;
+//             }
+//             continue;
+//         }
+//         num[numIndex] = c[0];
+//         numIndex ++;
+//     }
+
+//     // for(int j = 0; j < (p->width * p->height); j++){
+//     //     printf( "%d %d %d\n", (int)p->red[j], (int)p->green[j], (int)p->blue[j]);
+//     // }
+//     fclose(fp);
+
+//     return p;
+// }
+
 void delete_image(Image *image) {
-    free(image->red);
-    free(image->green);
-    free(image->blue);
+    if (image == NULL) return;
+
+    if (image->red) free(image->red);
+    if (image->green) free(image->green);
+    if (image->blue) free(image->blue);
+
     free(image);
 }
+
 
 unsigned short get_image_width(Image *image) {
     return image->width;

@@ -8,8 +8,8 @@
 #define ERROR(...) do {fprintf(stderr, "[          ] [ ERR  ] "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); fflush(stderr);} while(0) 
 
 typedef struct Image {
-    int width;
-    int height;
+    unsigned short width;
+    unsigned short height;
     unsigned char * red;
     unsigned char * green;
     unsigned char * blue;
