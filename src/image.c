@@ -108,7 +108,10 @@ Image *load_image(char *filename) {
 
     // handle body
     while (fgets(c, 2, fp)) {
-        if (c[0] == ' ') {
+        if (c[0] == ' ' || c[0] == '\n') {
+            if(numIndex == 0){
+                continue;
+            }
             num[numIndex] = '\0';
             int intensity = atoi(num);
             numIndex = 0;
@@ -122,6 +125,10 @@ Image *load_image(char *filename) {
         }
         num[numIndex++] = c[0];
     }
+
+    // for(int j = 0; j < (p->width * p->height); j++){
+    //     printf( "Line %d: %d %d %d\n", j, (int)p->red[j], (int)p->green[j], (int)p->blue[j]);
+    // }
 
     fclose(fp);
     return p;

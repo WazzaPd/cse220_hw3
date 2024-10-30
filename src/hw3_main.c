@@ -45,6 +45,10 @@ int main() {
 
     /******************************* hide_message and reveal_message *******************************/
     prepare_input_image_file("wolfie-tiny.ppm");
+    image = load_image("images/wolfie-tiny.ppm"); 
+    int i = get_image_intensity(image, 12, 18);
+    printf("%d", i);
+    delete_image(image); 
     hide_message("0000000000111111111122222222223333333333", "images/wolfie-tiny.ppm", "tests/output/hide_message1.ppm");
     char *message = reveal_message("tests/output/hide_message1.ppm");
     printf("Message: %s\n", message);
