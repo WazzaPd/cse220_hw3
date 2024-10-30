@@ -134,7 +134,8 @@ unsigned short get_image_height(Image *image) {
 }
 
 unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int col) {
-    unsigned int index = row*col;
+    unsigned int index = (row)*(image->width);
+    index += (col);
     return image->red[index];
 }
 
