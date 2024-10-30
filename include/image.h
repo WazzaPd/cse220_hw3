@@ -8,8 +8,18 @@
 #define ERROR(...) do {fprintf(stderr, "[          ] [ ERR  ] "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); fflush(stderr);} while(0) 
 
 typedef struct Image {
-    char placeholder[1];  // This is a placeholder. You should not use this struct.
+    int width;
+    int height;
+    unsigned char * red;
+    unsigned char * green;
+    unsigned char * blue;
 } Image;
+
+typedef enum{
+    RED = 1,
+    GREEN = 2,
+    BLUE = 3
+} Color;
 
 Image *load_image(char *filename);
 void delete_image(Image *image);
