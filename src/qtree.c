@@ -20,6 +20,11 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
     double  average1 = 0;
     long total1 = 0;
 
+    // if(width == 1 && height == 1){
+    //     unsigned char intensity = get_image_intensity(image, startRow, startCol);
+    //     printf("%d", intensity);
+    // }
+
     for (int row = startRow; row< height+startRow; row++){
         for(int col = startCol; col < width+startCol; col++){
             total1 += (long)(get_image_intensity(image, row, col));
@@ -47,11 +52,12 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
 QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
     QTNode * node = initializeNode(startRow, startCol, width, height);
 
+    double RMSE = calcRMSE(node, image, startRow, startCol, width, height);
+
     if(height == 1 && width == 1){
         return node;
     }
 
-    double RMSE = calcRMSE(node, image, startRow, startCol, width, height);
     unsigned short two_four_width = 0;
     unsigned short three_four_height = 0;
 
