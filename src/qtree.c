@@ -27,7 +27,7 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
     }
     average1 = (double) total1 / (height * width);
 
-    node->avgIntensity = (unsigned char)round(average1);
+    node->avgIntensity = (unsigned char)(average1);
 
     double total2 = 0;
     double average2 = 0;
@@ -69,15 +69,15 @@ QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short sta
     if(RMSE > max_rmse){
         if(width > 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height/2);
-            node->child2 = create_quadtree_helper(image, max_rmse, startRow, width/2, two_four_width, height/2);
-            node->child3 = create_quadtree_helper(image, max_rmse, height/2, startCol, width/2, three_four_height);
-            node->child4 = create_quadtree_helper(image, max_rmse, height/2, width/2, two_four_width, three_four_height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), two_four_width, height/2);
+            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width/2, three_four_height);
+            node->child4 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol + (width/2), two_four_width, three_four_height);
         } else if(width > 1 && height == 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height);
-            node->child2 = create_quadtree_helper(image, max_rmse, startRow, width/2, two_four_width, height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), two_four_width, height);
         } else if(width == 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width, height/2);
-            node->child3 = create_quadtree_helper(image, max_rmse, height/2, startCol, width, three_four_height);
+            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width, three_four_height);
         }
     }
     return node;
@@ -124,7 +124,7 @@ void delete_quadtree(QTNode *root) {
     if(root->child1 != NULL){
         delete_quadtree(root->child1);
     }
-    if(root->child2 != NULL){
+    if(root->child2!= NULL){
         delete_quadtree(root->child2);
     }
     if(root->child3 != NULL){
@@ -136,9 +136,55 @@ void delete_quadtree(QTNode *root) {
     free(root);
 }
 
+void getIntensities(QTNode *node, unsigned char* buffer, unsigned short imageWidth){
+    if(node == NULL) return;
+
+    unsigned short width = node->width;
+    unsigned short height = node->height;
+    unsigned short startRow = node->startRow;
+    unsigned short startCol = node->startCol;
+
+    // if node is a leaf node
+    if(get_child1(node) == NULL) {
+
+        for(int row = startRow; row<(height+startRow); row ++){
+            for (int col = startCol; col<(width+startCol); col++){
+                int bufferIndex = row * imageWidth + col;
+                buffer[bufferIndex] = get_node_intensity(node);
+            }
+        }
+    } else {
+        getIntensities(node->child1, buffer, imageWidth);
+        getIntensities(node->child2, buffer, imageWidth);
+        getIntensities(node->child3, buffer, imageWidth);
+        getIntensities(node->child4, buffer, imageWidth);
+    }
+}
+
 void save_qtree_as_ppm(QTNode *root, char *filename) {
-    (void)root;
-    (void)filename;
+    FILE *file = fopen(filename, "w");
+
+    if(!file){
+        perror("could not open file for writing");
+        return;
+    }
+
+    fprintf(file, "P3\n");
+    fprintf(file, "%d %d\n", root->width, root->height);
+    fprintf(file, "255\n");
+
+    unsigned char * buffer = malloc (sizeof(unsigned char) * root->width * root->height);
+    getIntensities(root, buffer, root->width);
+
+    for (int i = 0; i < root->height; ++i) {
+        for (int j = 0; j < root->width; ++j) {
+            int index = (i * root->width) + j;
+            fprintf(file, "%d %d %d\n", buffer[index], buffer[index], buffer[index]);
+        }
+    }
+
+    free(buffer);
+    fclose(file);
 }
 
 QTNode *load_preorder_qt(char *filename) {
