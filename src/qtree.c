@@ -1,13 +1,77 @@
 #include "qtree.h"
 
+QTNode* initializeNode(unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+    QTNode* node = malloc(sizeof(QTNode));
+    node->width = width;
+    node->height = height;
+    node->startRow = startRow;
+    node->startCol = startCol;
+    node->avgIntensity = 'n';
+    node->child1 = NULL;
+    node->child2 = NULL;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
+    return node;
+}
+
+double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+    
+    double  average1 = 0;
+    long total1 = 0;
+
+    for (int row = startRow; row< height+startRow; row++){
+        for(int col = startCol; col < width+startCol; col++){
+            total1 += (long)(get_image_intensity(image, row, col));
+        }
+    }
+    average1 = (double) total1 / (height * width);
+
+    node->avgIntensity = (unsigned char)round(average1);
+
+    double total2 = 0;
+    double average2 = 0;
+
+    for (int row = startRow; row< height+startRow; row++){
+        for(int col = startCol; col < width+startCol; col++){
+            double difference =  average1 - (get_image_intensity(image, row, col));
+            double squaredDifference = difference * difference;
+            total2 += squaredDifference;
+        }
+    }
+    average2 = total2 / (height*width);
+    
+    return sqrt(average2);
+}
+
+QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+    QTNode * node = initializeNode(startRow, startCol, width, height);
+    double RMSE = calcRMSE(node, image, startRow, startCol, width, height);
+    if(RMSE > max_rmse){
+        if(width > 1 && height > 1){
+            node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height/2);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, width/2, width/2, height/2);
+            node->child3 = create_quadtree_helper(image, max_rmse, height/2, startCol, width/2, height/2);
+            node->child4 = create_quadtree_helper(image, max_rmse, height/2, width/2, width/2, height/2);
+        } else if(width > 1 && height == 1){
+            node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, width/2, width/2, height);
+        } else if(width == 1 && height > 1){
+            node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width, height/2);
+            node->child3 = create_quadtree_helper(image, max_rmse, height/2, startCol, width, height/2);
+        }
+    }
+    return node;
+}
+
 QTNode *create_quadtree(Image *image, double max_rmse) {
-    (void)image;
-    (void)max_rmse;
-    return NULL;
+    unsigned short width = get_image_width(image);
+    unsigned short height = get_image_height(image);
+    return create_quadtree_helper(image, max_rmse, 0, 0, width, height);
 }
 
 QTNode *get_child1(QTNode *node) {
-    (void)node;
+    (void) node;
     return NULL;
 }
 
@@ -32,7 +96,21 @@ unsigned char get_node_intensity(QTNode *node) {
 }
 
 void delete_quadtree(QTNode *root) {
-    (void)root;
+    if(root == NULL) return;
+
+    if(root->child1 != NULL){
+        delete_quadtree(root->child1);
+    }
+    if(root->child2 != NULL){
+        delete_quadtree(root->child2);
+    }
+    if(root->child3 != NULL){
+        delete_quadtree(root->child3);
+    }
+    if(root->child4 != NULL){
+        delete_quadtree(root->child4);
+    }
+    free(root);
 }
 
 void save_qtree_as_ppm(QTNode *root, char *filename) {

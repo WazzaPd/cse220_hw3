@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "image.h"
 
@@ -11,7 +12,16 @@
 #define ERROR(...) do {fprintf(stderr, "[          ] [ ERR  ] "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); fflush(stderr);} while(0) 
 
 typedef struct QTNode {
-    char placeholder[1];  // This is a placeholder. You should not use this struct.    
+    unsigned short width;
+    unsigned short height;
+    unsigned short startRow;
+    unsigned short startCol;
+    unsigned char avgIntensity;
+    
+    struct QTNode *child1;
+    struct QTNode *child2;
+    struct QTNode *child3;
+    struct QTNode *child4;
 } QTNode;
 
 QTNode *create_quadtree(Image *image, double max_rmse);  

@@ -227,14 +227,17 @@ void delete_image(Image *image) {
 
 
 unsigned short get_image_width(Image *image) {
+    if (image == NULL) return 0;
     return image->width;
 }
 
 unsigned short get_image_height(Image *image) {
+    if (image == NULL) return 0;
     return image->height;
 }
 
 unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int col) {
+    if (image == NULL) return 0;
     unsigned int index = (row)*(image->width);
     index += (col);
     return image->red[index];
