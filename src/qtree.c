@@ -120,7 +120,7 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
     QTNode * node;
 
     int averagePixelTotal = 0;
-    double averagePixel = 0;
+    int averagePixel = 0;
     
     for(int row = startRow; row<startRow+height; row++){
         for(int col = startCol; col< startCol+width; col++){
@@ -140,6 +140,9 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
     node->avgIntensity = averagePixel;
 
     double RMSE = calcRMSE(image, startRow, startCol, height, width);
+    // if(height == 3 && width == 3){
+    //     printf("%f", RMSE);
+    // }
 
     int new_height = height/2;
     int new_width = width/2;
