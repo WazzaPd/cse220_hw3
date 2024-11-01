@@ -30,7 +30,10 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
             total1 += (long)(get_image_intensity(image, row, col));
         }
     }
-    average1 = (double) total1 / (height * width);
+
+    double HxW = height*width;
+
+    average1 = (double) total1 / HxW;
 
     node->avgIntensity = (unsigned char)(average1);
 
@@ -58,32 +61,18 @@ QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short sta
         return node;
     }
 
-    unsigned short two_four_width = 0;
-    unsigned short three_four_height = 0;
-
-    if (width % 2 == 1){
-        two_four_width = (width/2) + 1;
-    } else {
-        two_four_width = width/2;
-    }
-    if (height % 2 == 1){
-        three_four_height = (height/2) + 1;
-    } else {
-        three_four_height = height/2;
-    }
-
     if(RMSE > max_rmse){
         if(width > 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height/2);
-            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), two_four_width, height/2);
-            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width/2, three_four_height);
-            node->child4 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol + (width/2), two_four_width, three_four_height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height/2);
+            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width/2, (height - (height/2)));
+            node->child4 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol + (width/2), (width - (width/2)), (height - (height/2)));
         } else if(width > 1 && height == 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height);
-            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), two_four_width, height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height);
         } else if(width == 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width, height/2);
-            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width, three_four_height);
+            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width, (height - (height/2)));
         }
     }
     return node;
