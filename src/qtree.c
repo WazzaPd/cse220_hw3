@@ -96,7 +96,7 @@ double calcRMSE(Image * image, int startRow, int startCol, int height, int width
             averagePixelTotal += intensity;
         }
     }
-    averagePixel = (double)averagePixelTotal / (double)height*width;
+    averagePixel = (double)averagePixelTotal / ((double)height * width);
 
     double averageSquareDiffTotal = 0;
     double averageSquareDiff = 0;
@@ -108,7 +108,7 @@ double calcRMSE(Image * image, int startRow, int startCol, int height, int width
             averageSquareDiffTotal += (difference*difference); 
         }
     }
-    averageSquareDiff = averageSquareDiffTotal / (double)height*width;
+    averageSquareDiff = averageSquareDiffTotal / ((double)height * width);
 
     double squareroot = sqrt(averageSquareDiff);
     return squareroot;
@@ -128,7 +128,7 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
             averagePixelTotal += intensity;
         }
     }
-    averagePixel = (double)averagePixelTotal / (double)height*width;
+    averagePixel = (double)averagePixelTotal / ((double)height * width);
 
     if(width == 1 && height == 1){
         node = initializeNode(startRow, startCol, width, height);
