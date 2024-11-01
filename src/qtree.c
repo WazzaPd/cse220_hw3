@@ -193,9 +193,58 @@ void save_qtree_as_ppm(QTNode *root, char *filename) {
     fclose(file);
 }
 
+QTNode * load_preorder_qt_helper(FILE * fp, QTNode * root){
+    char internalOrLeaf;
+    int intensity;
+    int startRow;
+    int startCol;
+    int width;
+    int height;
+
+    if(fscanf(fp, "%c %d %d %d %d %d\n", &internalOrLeaf, &intensity, &startRow, &height, &startCol, &width) < 1){
+        return NULL;
+    }
+
+    root = initializeNode(startRow, startCol, width, height);
+    root->avgIntensity = intensity;
+    if(internalOrLeaf == 'N'){
+        root->child1 = load_preorder_qt_helper(fp, root->child1);
+        root->child2 = load_preorder_qt_helper(fp, root->child2);
+        root->child3 = load_preorder_qt_helper(fp, root->child3);
+        root->child4 = load_preorder_qt_helper(fp, root->child4);
+    }
+
+    return root;
+}
+
 QTNode *load_preorder_qt(char *filename) {
-    (void)filename;
-    return NULL;
+    FILE *fp = fopen(filename, "r");
+
+    if (fp == NULL) {
+        perror("Error opening file");
+        return NULL;
+    }
+    
+    char internalOrLeaf;
+    int intensity;
+    int startRow;
+    int startCol;
+    int width;
+    int height;
+
+    if(fscanf(fp, "%c %d %d %d %d %d\n", &internalOrLeaf, &intensity, &startRow, &height, &startCol, &width) < 1){
+        return NULL;
+    }
+    QTNode * node = initializeNode(startRow, startCol, width, height);
+    node->avgIntensity = intensity;
+    node->child1 = load_preorder_qt_helper(fp, node->child1);
+    node->child2 = load_preorder_qt_helper(fp, node->child2);
+    node->child3 = load_preorder_qt_helper(fp, node->child3);
+    node->child4 = load_preorder_qt_helper(fp, node->child4);
+
+    fclose(fp);
+
+    return node;
 }
 
 void save_preorder_qt(QTNode *root, char *filename) {
