@@ -55,13 +55,17 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
 QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
     QTNode * node = initializeNode(startRow, startCol, width, height);
 
+    if(height == 1 && width == 1){
+        printf("single");
+    }
+    
     double RMSE = calcRMSE(node, image, startRow, startCol, width, height);
 
     if(height == 1 && width == 1){
         return node;
     }
 
-    if(RMSE > max_rmse){
+    if(RMSE >= max_rmse){
         if(width > 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height/2);
             node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height/2);
