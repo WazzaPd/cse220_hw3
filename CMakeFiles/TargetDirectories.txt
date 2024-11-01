@@ -1,0 +1,6 @@
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/hw3_main.dir
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/hw3_main_asan.dir
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/valgrind_hw3.dir
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/test.dir
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/edit_cache.dir
+/home/joseph/CSE220/cse220_hw3/CMakeFiles/rebuild_cache.dir

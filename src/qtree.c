@@ -15,7 +15,7 @@ QTNode* initializeNode(unsigned short startRow, unsigned short startCol, unsigne
     return node;
 }
 
-double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+double calcRMSE(QTNode * node, Image * image, int startRow, int startCol, int width, int height){
     
     double  average1 = 0;
     long total1 = 0;
@@ -52,7 +52,7 @@ double calcRMSE(QTNode * node, Image * image, unsigned short startRow, unsigned 
     return sqrt(average2);
 }
 
-QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+QTNode *create_quadtree_helper(Image *image, double max_rmse, int startRow, int startCol, int width, int height){
     QTNode * node = initializeNode(startRow, startCol, width, height);
 
     // if(height == 1 && width == 1){
@@ -71,17 +71,17 @@ QTNode *create_quadtree_helper(Image *image, double max_rmse, unsigned short sta
             node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height/2);
             node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width/2, (height - (height/2)));
             node->child4 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol + (width/2), (width - (width/2)), (height - (height/2)));
-        } //else if(width > 1 && height == 1){
-        //     node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height);
-        //     node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height);
-        //     node->child3 = NULL;
-        //     node->child4 = NULL;
-        // } else if(width == 1 && height > 1){
-        //     node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width, height/2);
-        //     node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width, (height - (height/2)));
-        //     node->child2 = NULL;
-        //     node->child4 = NULL;
-        // }
+        } else if(width > 1 && height == 1){
+            node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width/2, height);
+            node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol + (width/2), (width - (width/2)), height);
+            node->child3 = NULL;
+            node->child4 = NULL;
+        } else if(width == 1 && height > 1){
+            node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, width, height/2);
+            node->child3 = create_quadtree_helper(image, max_rmse, startRow + (height/2), startCol, width, (height - (height/2)));
+            node->child2 = NULL;
+            node->child4 = NULL;
+        }
     }
     return node;
 }
@@ -93,26 +93,18 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
 }
 
 QTNode *get_child1(QTNode *node) {
-    if(node == NULL) return NULL;
-    
     return node->child1;
 }
 
 QTNode *get_child2(QTNode *node) {
-    if(node == NULL) return NULL;
-    
     return node->child1;
 }
 
 QTNode *get_child3(QTNode *node) {
-    if(node == NULL) return NULL;
-    
     return node->child1;
 }
 
 QTNode *get_child4(QTNode *node) {
-    if(node == NULL) return NULL;
-    
     return node->child1;
 }
 

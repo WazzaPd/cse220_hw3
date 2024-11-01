@@ -1,0 +1,1 @@
+/usr/bin/clang CMakeFiles/hw3_main.dir/src/qtree.c.o CMakeFiles/hw3_main.dir/src/image.c.o CMakeFiles/hw3_main.dir/src/hw3_main.c.o CMakeFiles/hw3_main.dir/tests/src/tests_utils.c.o -o hw3_main  -lm 
