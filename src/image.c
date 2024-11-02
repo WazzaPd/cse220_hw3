@@ -214,7 +214,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
                     messageIndex ++;
                     encodeChar = message[messageIndex];
                 }
-            } else if(messageIndex >= printableChars) {
+            } else if(messageIndex == printableChars) {
                 encodeChar = '\0';
                 if((encodeChar >> (7 - messageBitCounter)) & 1){            // encode 1
                     red = red | 1;
