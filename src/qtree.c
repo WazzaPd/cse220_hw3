@@ -283,10 +283,19 @@ QTNode * load_preorder_qt_helper(FILE * fp, QTNode * root){
     root = initializeNode(startRow, startCol, width, height);
     root->avgIntensity = intensity;
     if(internalOrLeaf == 'N'){
-        root->child1 = load_preorder_qt_helper(fp, root->child1);
-        root->child2 = load_preorder_qt_helper(fp, root->child2);
-        root->child3 = load_preorder_qt_helper(fp, root->child3);
-        root->child4 = load_preorder_qt_helper(fp, root->child4);
+        if(width > 1 && height > 1){
+            root->child1 = load_preorder_qt_helper(fp, root->child1);
+            root->child2 = load_preorder_qt_helper(fp, root->child2);
+            root->child3 = load_preorder_qt_helper(fp, root->child3);
+            root->child4 = load_preorder_qt_helper(fp, root->child4);
+        }
+        else if(width == 1 && height > 1){
+            root->child1 = load_preorder_qt_helper(fp, root->child1);
+            root->child3 = load_preorder_qt_helper(fp, root->child3);
+        } else if(width > 1 && height == 1){
+            root->child1 = load_preorder_qt_helper(fp, root->child1);
+            root->child2 = load_preorder_qt_helper(fp, root->child2);
+        }
     }
 
     return root;
@@ -314,15 +323,9 @@ QTNode *load_preorder_qt(char *filename) {
     node->avgIntensity = intensity;
     
     node->child1 = load_preorder_qt_helper(fp, node->child1);
-    if(get_child2(node)!= NULL){
-        node->child2 = load_preorder_qt_helper(fp, node->child2);
-    }
-    if(get_child3(node)!= NULL){
+    node->child2 = load_preorder_qt_helper(fp, node->child2);
     node->child3 = load_preorder_qt_helper(fp, node->child3);
-    }
-    if(get_child4(node)!= NULL){
     node->child4 = load_preorder_qt_helper(fp, node->child4);
-    }
 
     fclose(fp);
 
