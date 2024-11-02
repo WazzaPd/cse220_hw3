@@ -347,6 +347,7 @@ void save_preorder_qt_helper(QTNode *root, FILE * fp){
         fprintf(fp, "%c %d %d %d %d %d\n", node_or_leaf, intensity, startRow, height, startCol, width);
         return;
     }
+    fprintf(fp, "%c %d %d %d %d %d\n", node_or_leaf, intensity, startRow, height, startCol, width);
 
     save_preorder_qt_helper(get_child1(root), fp);
     if(get_child2(root)!= NULL){
