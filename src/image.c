@@ -342,6 +342,9 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
             fprintf(newFile, "%d %d %d\n", red, green, blue);
         }
     }
+    fclose(fp);
+    fclose(newFile);
+
     return printableChars;
 }
 
