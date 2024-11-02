@@ -345,7 +345,7 @@ void save_preorder_qt_helper(QTNode *root, FILE * fp){
     int startCol = root->startCol;
     int width = root->width;
     
-    if(get_child1(root) == NULL){
+    if(get_child1(root) == NULL){               // IF node, child1 will always be initialized
         node_or_leaf = 'L';
         fprintf(fp, "%c %d %d %d %d %d\n", node_or_leaf, intensity, startRow, height, startCol, width);
         return;
@@ -376,5 +376,6 @@ void save_preorder_qt(QTNode *root, char *filename) {
     }
 
     save_preorder_qt_helper(root, fp);
+    fclose(fp);
 }
 
