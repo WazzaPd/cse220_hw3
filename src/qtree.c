@@ -1,20 +1,5 @@
 #include "qtree.h"
 
-QTNode* initializeNode(unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
-    QTNode* node = malloc(sizeof(QTNode));
-    node->width = width;
-    node->height = height;
-    node->startRow = startRow;
-    node->startCol = startCol;
-    node->avgIntensity = 'n';
-    node->child1 = NULL;
-    node->child2 = NULL;
-    node->child3 = NULL;
-    node->child4 = NULL;
-
-    return node;
-}
-
 // double calcRMSE(QTNode * node, Image * image, int startRow, int startCol, int width, int height){
     
 //     double  average1 = 0;
@@ -85,6 +70,21 @@ QTNode* initializeNode(unsigned short startRow, unsigned short startCol, unsigne
 //     }
 //     return node;
 // }
+
+QTNode* initializeNode(unsigned short startRow, unsigned short startCol, unsigned short width, unsigned short height){
+    QTNode* node = malloc(sizeof(QTNode));
+    node->width = width;
+    node->height = height;
+    node->startRow = startRow;
+    node->startCol = startCol;
+    node->avgIntensity = 'n';
+    node->child1 = NULL;
+    node->child2 = NULL;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
+    return node;
+}
 
 double calcRMSE(Image * image, int startRow, int startCol, int height, int width ){
     int averagePixelTotal = 0;
