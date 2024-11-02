@@ -104,16 +104,16 @@ Image *load_image(char *filename) {
     // handle body
     int r, g, b;
     for (int j = 0; j < p->width * p->height; j++) {
-        if (fscanf(fp, "%d %d %d", &r, &g, &b) != 3) {
+        if (fscanf(fp, "%d %d %d\n", &r, &g, &b) != 3) {
             fprintf(stderr, "Error reading pixel data\n");
             free(p->red); free(p->green); free(p->blue);
             free(p);
             fclose(fp);
             return NULL;
         }
-        p->red[i] = (unsigned char)r;
-        p->green[i] = (unsigned char)g;
-        p->blue[i] = (unsigned char)b;
+        p->red[j] = (unsigned char)r;
+        p->green[j] = (unsigned char)g;
+        p->blue[j] = (unsigned char)b;
     }
 
     // for(int j = 0; j < (p->width * p->height); j++){
