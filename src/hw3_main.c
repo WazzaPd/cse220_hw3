@@ -14,12 +14,24 @@ int main() {
     Image *image = load_image("images/wolfie.ppm");
     QTNode *root = create_quadtree(image, max_rmse);
     // See tests/input/load_preorder_qt1_qtree.txt for the expected results
+
+    save_qtree_as_ppm(root, "tests/output/newWolfie.ppm");
+
     // You will need to write your own code to verify that your quadtree was constructed properly
     delete_quadtree(root);
     delete_image(image);
 
     prepare_input_image_file("testing.ppm");
-    max_rmse = 50;
+    createPPMgivenBase("images/testing.ppm", 200);
+    image = load_image("images/createdPPM.ppm");
+    root = create_quadtree(image, 11);
+    save_qtree_as_ppm(root, "tests/output/outputCreatedPPM.ppm");
+    delete_quadtree(root);
+    delete_image(image);
+
+
+    prepare_input_image_file("testing.ppm");
+    max_rmse = 11;
     image = load_image("images/testing.ppm");
     root = create_quadtree(image, max_rmse);
     save_qtree_as_ppm(root, "tests/output/test1.ppm");
