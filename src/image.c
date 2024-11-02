@@ -218,11 +218,91 @@ unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int c
 }
 
 unsigned int hide_message(char *message, char *input_filename, char *output_filename) {
-    (void)message;
-    (void)input_filename;
-    (void)output_filename;
-    return 0;
+    FILE * fp = fopen(input_filename, "r");
+    FILE * newFile = fopen(output_filename, "w");
+
+    char line[256];
+    char c[2];
+    // handle header
+    fgets(line, 13, fp);  // p3
+    fgets(c, 2, fp);
+    while (c[0] == '#') {
+        do {
+            fgets(c, 2, fp);
+        } while (c[0] != '\n');
+        fgets(c, 2, fp);
+    }
+
+    char widthS[5] = {0};
+    int i = 0;
+    while (c[0] != ' ' && i < 3) {
+        widthS[i++] = c[0];
+        fgets(c, 2, fp);
+    }
+    widthS[i] = '\0';
+
+    fgets(c, 2, fp);
+    char heightS[5] = {0};
+    i = 0;
+    while (c[0] != '\n' && i < 3) {
+        heightS[i++] = c[0];
+        fgets(c, 2, fp);
+    }
+    heightS[i] = '\0';
+    int width = atoi(widthS);
+    int height = atoi(heightS);
+    fprintf(newFile, "P3\n");
+    fprintf(newFile, "%d %d\n", width, height);
+    fprintf(newFile, "255\n");
+
+    // handle body
+    int red; 
+    int green; 
+    int blue;
+    int messageSize = (strlen(message) + 1) * 8;
+    int messageIndex = 0;
+    int messageBitCounter = 0;
+    char encodeChar = message[messageIndex];
+    int printableChars = 0;
+
+    if(messageSize > width*height){
+        printableChars = ((width*height) / 8) - 1;
+
+    }else{
+        printableChars = strlen(message);
+        for (int j = 0; j < width * height; j++) {
+            if (fscanf(fp, "%d %d %d\n", &red, &green, &blue) != 3) {
+                fprintf(stderr, "Error reading pixel data\n");
+                fclose(fp);
+                return -1;
+            }
+            if(messageIndex <= (messageSize/8)){
+                if((encodeChar >> (8 - messageBitCounter)) & 1){            // encode 1
+                    red = red | 1;
+                    green = green | 1;
+                    blue = blue | 1;
+                } else{                                                     // encode 0
+                    red = red & ~1;
+                    green = green & ~1;
+                    blue = blue & ~1;
+                }
+                messageBitCounter ++;
+
+                if(messageBitCounter % 8 == 0){
+                    messageBitCounter = 0;
+                    messageIndex ++;
+                    encodeChar = message[messageIndex];
+                }
+            }
+            fprintf(newFile, "%d %d %d\n", red, green, blue);
+        }
+    }
+    return printableChars;
 }
+
+// void populateNewFile(FILE * fp, FILE * newFile, char *message){
+
+// }
 
 char *reveal_message(char *input_filename) {
     (void)input_filename;
