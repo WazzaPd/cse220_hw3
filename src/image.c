@@ -268,6 +268,51 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     if(messageSize > width*height){
         printableChars = ((width*height) / 8) - 1;
 
+        for (int j = 0; j < width * height; j++) {
+            if (fscanf(fp, "%d %d %d\n", &red, &green, &blue) != 3) {
+                fprintf(stderr, "Error reading pixel data\n");
+                fclose(fp);
+                return -1;
+            }
+            if(messageIndex < printableChars){
+                if((encodeChar >> (8 - messageBitCounter)) & 1){            // encode 1
+                    red = red | 1;
+                    green = green | 1;
+                    blue = blue | 1;
+                } else{                                                     // encode 0
+                    red = red & ~1;
+                    green = green & ~1;
+                    blue = blue & ~1;
+                }
+                messageBitCounter ++;
+
+                if(messageBitCounter % 8 == 0){
+                    messageBitCounter = 0;
+                    messageIndex ++;
+                    encodeChar = message[messageIndex];
+                }
+            } else if(messageIndex > printableChars) {
+                encodeChar = '\0';
+                if((encodeChar >> (8 - messageBitCounter)) & 1){            // encode 1
+                    red = red | 1;
+                    green = green | 1;
+                    blue = blue | 1;
+                } else{                                                     // encode 0
+                    red = red & ~1;
+                    green = green & ~1;
+                    blue = blue & ~1;
+                }
+                messageBitCounter ++;
+
+                if(messageBitCounter % 8 == 0){
+                    messageBitCounter = 0;
+                    messageIndex ++;
+                    encodeChar = message[messageIndex];
+                }
+            }
+            fprintf(newFile, "%d %d %d\n", red, green, blue);
+        }
+
     }else{
         printableChars = strlen(message);
         for (int j = 0; j < width * height; j++) {
