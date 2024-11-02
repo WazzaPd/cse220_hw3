@@ -221,6 +221,15 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     FILE * fp = fopen(input_filename, "r");
     FILE * newFile = fopen(output_filename, "w");
 
+    if (fp == NULL) {
+        perror("error reading file");
+        return 0;
+    }
+    if (newFile == NULL) {
+        perror("error writing file");
+        return 0;
+    }
+
     char line[256];
     char c[2];
     // handle header
