@@ -183,15 +183,15 @@ QTNode *get_child1(QTNode *node) {
 }
 
 QTNode *get_child2(QTNode *node) {
-    return node->child1;
+    return node->child2;
 }
 
 QTNode *get_child3(QTNode *node) {
-    return node->child1;
+    return node->child3;
 }
 
 QTNode *get_child4(QTNode *node) {
-    return node->child1;
+    return node->child4;
 }
 
 unsigned char get_node_intensity(QTNode *node) {
