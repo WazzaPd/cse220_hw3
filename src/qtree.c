@@ -146,8 +146,8 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
 
     int new_height = height/2;
     int new_width = width/2;
-    int height_remainder = height - (height/2);
-    int width_remainder = width - (width/2);
+    int height_remainder = height / 2 + (height % 2);
+    int width_remainder = width / 2 + (width % 2);
 
     if(RMSE > max_rmse) {
         if(width > 1 && height > 1){

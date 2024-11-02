@@ -7,15 +7,14 @@ int main() {
     struct stat st;
     if (stat("tests/output", &st) == -1)
         mkdir("tests/output", 0700);
-    prepare_input_image_file("wolfie.ppm"); // copies the image to the images/ directory
+    prepare_input_image_file("building1.ppm"); // copies the image to the images/ directory
 
     /******************************* create_quadtree *******************************/
     double max_rmse = 25;
-    Image *image = load_image("images/wolfie.ppm");
+    Image *image = load_image("images/building1.ppm");
     QTNode *root = create_quadtree(image, max_rmse);
     // See tests/input/load_preorder_qt1_qtree.txt for the expected results
 
-    save_qtree_as_ppm(root, "tests/output/newWolfie.ppm");
 
     // You will need to write your own code to verify that your quadtree was constructed properly
     delete_quadtree(root);
