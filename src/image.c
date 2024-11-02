@@ -326,10 +326,110 @@ char *reveal_message(char *input_filename) {
 }
 
 unsigned int hide_image(char *secret_image_filename, char *input_filename, char *output_filename) {
-    (void)secret_image_filename;
-    (void)input_filename;
-    (void)output_filename;
-    return 10;
+    FILE *secretFp = fopen(secret_image_filename, "r");
+    FILE *fp = fopen(input_filename, "r");
+    FILE *encodedFp = fopen(output_filename, "w");
+
+    int * dimensions = handleHeader(secretFp);
+    int widthSecret = dimensions[0];
+    int heightSecret = dimensions[1];
+
+    dimensions = handleHeader(fp);
+    int width = dimensions[0];
+    int height = dimensions[1];
+
+    free(dimensions);
+
+    if(widthSecret*heightSecret > ((width*height)/8) - 16){
+        fclose(secretFp);
+        fclose(fp);
+        fclose(encodedFp);
+        return 0;
+    }
+    
+    //handle body
+    int pixelIndex = 0;
+    int pixelBitCounter = 0;
+    int imageSize = widthSecret*heightSecret;
+
+    int red, green, blue;
+    int redSecret, greenSecret, blueSecret;
+
+    int widthCounter = 0;
+    int heightCounter = 0;
+
+    if (fscanf(secretFp, "%d %d %d\n", &redSecret, &greenSecret, &blueSecret) != 3) {      //initial pop of secret colors
+        fprintf(stderr, "Error reading pixel data from secret file\n");
+        fclose(fp);
+        return 0;
+    }
+
+    for (int j = 0; j < width * height; j++) {                                              //reading normal file
+        if (fscanf(fp, "%d %d %d\n", &red, &green, &blue) != 3) {
+            fprintf(stderr, "Error reading pixel data from normal file\n");
+            fclose(fp);
+            return 0;
+        }
+        if(pixelIndex < imageSize){
+            if(j < 16){
+                if(widthCounter < 8){                                       //width encoding
+                    if((width >> (7 - widthCounter)) & 1){            // encode 1
+                        red = red | 1;
+                        green = green | 1;
+                        blue = blue | 1;
+                    } else{                                                     // encode 0
+                        red = red & ~1;
+                        green = green & ~1;
+                        blue = blue & ~1;
+                    }
+                    widthCounter++;
+                } else {                                                    // height encoding
+                    if((height >> (7 - heightCounter)) & 1){            // encode 1
+                        red = red | 1;
+                        green = green | 1;
+                        blue = blue | 1;
+                    } else{                                                     // encode 0
+                        red = red & ~1;
+                        green = green & ~1;
+                        blue = blue & ~1;
+                    }
+                    heightCounter++;
+                }
+                fprintf(encodedFp, "%d %d %d\n", red, green, blue);
+            } else {
+                if(pixelIndex <= (imageSize)){                                  // color encoding (GRAY SCALE ONLY)
+                    if((redSecret >> (7 - pixelBitCounter)) & 1){            // encode 1
+                        red = red | 1;
+                        green = green | 1;
+                        blue = blue | 1;
+                    } else{                                                     // encode 0
+                        red = red & ~1;
+                        green = green & ~1;
+                        blue = blue & ~1;
+                    }
+                    pixelBitCounter ++;
+
+                    if(pixelBitCounter % 8 == 0){
+                        pixelBitCounter = 0;
+                        pixelIndex ++;
+                        if (fscanf(secretFp, "%d %d %d\n", &redSecret, &greenSecret, &blueSecret) != 3 && pixelIndex != imageSize) {      //update secret colors
+                            fprintf(stderr, "Error reading pixel data from secret file\n");
+                            fclose(fp);
+                            return 0;
+                        }
+                    }
+                }
+                fprintf(encodedFp, "%d %d %d\n", red, green, blue);
+            }
+        } else {
+            fprintf(encodedFp, "%d %d %d\n", red, green, blue);
+        }
+    }
+    fclose(fp);
+    fclose(secretFp);
+    fclose (encodedFp);
+
+    return 1;
 }
 
 void reveal_image(char *input_filename, char *output_filename) {
