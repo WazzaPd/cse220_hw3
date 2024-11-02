@@ -20,13 +20,13 @@ int main() {
     delete_quadtree(root);
     delete_image(image);
 
-    prepare_input_image_file("testing.ppm");
-    createPPMgivenBase("images/testing.ppm", 200);
-    image = load_image("images/createdPPM.ppm");
-    root = create_quadtree(image, 11);
-    save_qtree_as_ppm(root, "tests/output/outputCreatedPPM.ppm");
-    delete_quadtree(root);
-    delete_image(image);
+    // prepare_input_image_file("testing.ppm");
+    // createPPMgivenBase("images/testing.ppm", 200);
+    // image = load_image("images/createdPPM.ppm");
+    // root = create_quadtree(image, 11);
+    // save_qtree_as_ppm(root, "tests/output/outputCreatedPPM.ppm");
+    // delete_quadtree(root);
+    // delete_image(image);
 
 
     prepare_input_image_file("testing.ppm");

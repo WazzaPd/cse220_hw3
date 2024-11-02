@@ -146,8 +146,8 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
 
     int new_height = height/2;
     int new_width = width/2;
-    int height_remainder = height / 2 + (height % 2);
-    int width_remainder = width / 2 + (width % 2);
+    int height_remainder = height / 2 + (height % 2);       // add remainder if there is
+    int width_remainder = width / 2 + (width % 2);          // add remainder if there is
 
     if(RMSE > max_rmse) {
         if(width > 1 && height > 1){
@@ -158,10 +158,14 @@ QTNode *create_quadtree_helper(Image * image, double max_rmse, int startRow, int
         } 
         else if (width == 1 && height > 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, new_height, width);
+            node->child2 = NULL;
             node->child3 = create_quadtree_helper(image, max_rmse, startRow+new_height, startCol, height_remainder, width);             // remainder height
+            node->child4 = NULL;
         } else if(width > 1 && height == 1){
             node->child1 = create_quadtree_helper(image, max_rmse, startRow, startCol, height, new_width);
             node->child2 = create_quadtree_helper(image, max_rmse, startRow, startCol+new_width, height, width_remainder);              //remainder width
+            node->child3 = NULL;
+            node->child4 = NULL;
         }
     }
 
@@ -308,18 +312,65 @@ QTNode *load_preorder_qt(char *filename) {
     }
     QTNode * node = initializeNode(startRow, startCol, width, height);
     node->avgIntensity = intensity;
+    
     node->child1 = load_preorder_qt_helper(fp, node->child1);
-    node->child2 = load_preorder_qt_helper(fp, node->child2);
+    if(get_child2(node)!= NULL){
+        node->child2 = load_preorder_qt_helper(fp, node->child2);
+    }
+    if(get_child3(node)!= NULL){
     node->child3 = load_preorder_qt_helper(fp, node->child3);
+    }
+    if(get_child4(node)!= NULL){
     node->child4 = load_preorder_qt_helper(fp, node->child4);
+    }
 
     fclose(fp);
 
     return node;
 }
 
+void save_preorder_qt_helper(QTNode *root, FILE * fp){
+
+    if(root == NULL){
+        return;
+    }
+
+    char node_or_leaf = 'N';
+    int intensity = root->avgIntensity;
+    int startRow = root->startRow;
+    int height = root->height;
+    int startCol = root->startCol;
+    int width = root->width;
+    
+    if(get_child1(root) == NULL){
+        node_or_leaf = 'L';
+        fprintf(fp, "%c %d %d %d %d %d\n", node_or_leaf, intensity, startRow, height, startCol, width);
+        return;
+    }
+
+    save_preorder_qt_helper(get_child1(root), fp);
+    if(get_child2(root)!= NULL){
+        save_preorder_qt_helper(get_child2(root), fp);
+    }
+    if(get_child3(root)!= NULL){
+        save_preorder_qt_helper(get_child3(root), fp);
+    }
+    if(get_child4(root)!= NULL){
+        save_preorder_qt_helper(get_child4(root), fp);
+    }
+
+
+
+}
+
 void save_preorder_qt(QTNode *root, char *filename) {
-    (void)root;
-    (void)filename;
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp){
+        perror("could not open file for writing");
+        return;
+    }
+
+    save_preorder_qt_helper(root, fp);
 }
 

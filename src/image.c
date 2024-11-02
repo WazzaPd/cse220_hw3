@@ -124,70 +124,70 @@ Image *load_image(char *filename) {
     return p;
 }
 
-void createPPMgivenBase(char *filename, int multiplied){
-    FILE *newFile = fopen("images/createdPPM.ppm", "w");
-    if (!newFile) {
-        perror("Error creating new file");
-        return;
-    }
-    FILE * fp = fopen(filename, "r");
+// void createPPMgivenBase(char *filename, int multiplied){
+//     FILE *newFile = fopen("images/createdPPM.ppm", "w");
+//     if (!newFile) {
+//         perror("Error creating new file");
+//         return;
+//     }
+//     FILE * fp = fopen(filename, "r");
 
 
-    char line[256];
-    char c[2];
-    // handle header
-    fgets(line, 13, fp);  // p3
-    fgets(c, 2, fp);
-    while (c[0] == '#') {
-        do {
-            fgets(c, 2, fp);
-        } while (c[0] != '\n');
-        fgets(c, 2, fp);
-    }
+//     char line[256];
+//     char c[2];
+//     // handle header
+//     fgets(line, 13, fp);  // p3
+//     fgets(c, 2, fp);
+//     while (c[0] == '#') {
+//         do {
+//             fgets(c, 2, fp);
+//         } while (c[0] != '\n');
+//         fgets(c, 2, fp);
+//     }
 
-    char widthS[5] = {0};
-    int i = 0;
-    while (c[0] != ' ' && i < 3) {
-        widthS[i++] = c[0];
-        fgets(c, 2, fp);
-    }
-    widthS[i] = '\0';
+//     char widthS[5] = {0};
+//     int i = 0;
+//     while (c[0] != ' ' && i < 3) {
+//         widthS[i++] = c[0];
+//         fgets(c, 2, fp);
+//     }
+//     widthS[i] = '\0';
 
-    fgets(c, 2, fp);
-    char heightS[5] = {0};
-    i = 0;
-    while (c[0] != '\n' && i < 3) {
-        heightS[i++] = c[0];
-        fgets(c, 2, fp);
-    }
-    heightS[i] = '\0';
+//     fgets(c, 2, fp);
+//     char heightS[5] = {0};
+//     i = 0;
+//     while (c[0] != '\n' && i < 3) {
+//         heightS[i++] = c[0];
+//         fgets(c, 2, fp);
+//     }
+//     heightS[i] = '\0';
 
-    int width = atoi(widthS);
-    int height = atoi(heightS);
+//     int width = atoi(widthS);
+//     int height = atoi(heightS);
 
-    // Allocate an initial buffer
-    char *buffer = malloc(1);
-    buffer[0] = '\0';
-    size_t bufferSize = 1;
+//     // Allocate an initial buffer
+//     char *buffer = malloc(1);
+//     buffer[0] = '\0';
+//     size_t bufferSize = 1;
 
-    // Read the rest of the file and store it in the buffer
-    while (fgets(line, sizeof(line), fp)) {
-        bufferSize += strlen(line);
-        buffer = realloc(buffer, bufferSize);
-        strcat(buffer, line);
-    }
+//     // Read the rest of the file and store it in the buffer
+//     while (fgets(line, sizeof(line), fp)) {
+//         bufferSize += strlen(line);
+//         buffer = realloc(buffer, bufferSize);
+//         strcat(buffer, line);
+//     }
 
-    //create new file
-    fprintf(newFile, "P3\n");
-    fprintf(newFile, "%d %d\n", width*multiplied, height*multiplied);
-    fprintf(newFile, "255\n");
+//     //create new file
+//     fprintf(newFile, "P3\n");
+//     fprintf(newFile, "%d %d\n", width*multiplied, height*multiplied);
+//     fprintf(newFile, "255\n");
 
-    for(int j = 0; j< (multiplied*multiplied); j ++){
-        fprintf(newFile, "%s",buffer);
-    }
-    fclose(fp);
-    fclose(newFile);
-}
+//     for(int j = 0; j< (multiplied*multiplied); j ++){
+//         fprintf(newFile, "%s",buffer);
+//     }
+//     fclose(fp);
+//     fclose(newFile);
+//  }
 
 void delete_image(Image *image) {
     if (image == NULL) return;
