@@ -68,7 +68,7 @@ int main() {
     prepare_input_image_file("wolfie-tiny.ppm");
     image = load_image("images/wolfie-tiny.ppm");
     delete_image(image); 
-    hide_message("0000000000111111111122222222223333OVERFLOW", "images/wolfie-tiny.ppm", "tests/output/hide_message1.ppm");
+    hide_message("0000000000111111111122222222223333OERFLOW", "images/wolfie-tiny.ppm", "tests/output/hide_message1.ppm");
     char *message = reveal_message("tests/output/hide_message1.ppm");
     printf("Message: %s\n", message);
     free(message);

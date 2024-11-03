@@ -244,7 +244,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
                 fclose(fp);
                 return -1;
             }
-            if(messageIndex <= (messageSize/8)){
+            if(messageIndex < (messageSize/8)){
                 if((encodeChar >> (7 - messageBitCounter)) & 1){            // encode 1
                     red = red | 1;
                     green = green | 1;
