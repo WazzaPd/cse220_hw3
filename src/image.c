@@ -259,7 +259,9 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
                 if(messageBitCounter % 8 == 0){
                     messageBitCounter = 0;
                     messageIndex ++;
-                    encodeChar = message[messageIndex];
+                    if(messageIndex != (messageSize/8)){
+                        encodeChar = message[messageIndex];
+                    }
                 }
             }
             fprintf(newFile, "%d %d %d\n", red, green, blue);
