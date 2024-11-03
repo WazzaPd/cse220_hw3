@@ -330,6 +330,19 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     FILE *fp = fopen(input_filename, "r");
     FILE *encodedFp = fopen(output_filename, "w");
 
+    if (secretFp == NULL) {
+        perror("error reading file");
+        return 0;
+    }
+    if (fp == NULL) {
+        perror("error reading file");
+        return 0;
+    }
+    if (encodedFp == NULL) {
+        perror("error reading file");
+        return 0;
+    }
+
     int * dimensions = handleHeader(secretFp);
     int widthSecret = dimensions[0];
     int heightSecret = dimensions[1];
@@ -433,8 +446,112 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
 }
 
 void reveal_image(char *input_filename, char *output_filename) {
-    (void)input_filename;
-    (void)output_filename;
+    FILE *fp = fopen(input_filename, "r");
+    FILE *hiddenFp = fopen(output_filename, "w");
+
+    if (fp == NULL) {
+        perror("error reading file");
+        return;
+    }
+    if (hiddenFp == NULL) {
+        perror("error writing file");
+        return;
+    }
+
+    int * dimensions = handleHeader(fp);
+    int width = dimensions[0];
+    int height = dimensions[1];
+
+    free(dimensions);
+
+    fprintf(hiddenFp, "P3\n");
+
+    //handle body
+    int numberIndex = 0;
+    int numberBits[8] = {0};
+    int numberBitCounter = 0;
+
+    int number = 0;
+
+    int widthSecret = 0;
+    int heightSecret = 0;
+    int widthSecretBits[8] = {0};
+    int heightSecretBits[8] = {0};
+    int widthSecretCounter = 0;
+    int heightSecretCounter = 0;
+    int widthSecretIndex = 0;
+
+    int red, green, blue;
+    for (int j = 0; j < width * height; j++) {
+        if (fscanf(fp, "%d %d %d\n", &red, &green, &blue) != 3) {
+            fprintf(stderr, "Error reading pixel data\n");
+            fclose(fp);
+            return;
+        }
+        if(j< 16){
+            if(widthSecretIndex == 0){
+                widthSecretBits[widthSecretCounter] = red & 1;
+                widthSecretCounter ++;
+
+                if(widthSecretCounter%8 == 0){
+                    widthSecret = 0;
+                    widthSecret |= (widthSecretBits[0] << 7);
+                    widthSecret |= (widthSecretBits[1] << 6);
+                    widthSecret |= (widthSecretBits[2] << 5);
+                    widthSecret |= (widthSecretBits[3] << 4);
+                    widthSecret |= (widthSecretBits[4] << 3);
+                    widthSecret |= (widthSecretBits[5] << 2);
+                    widthSecret |= (widthSecretBits[6] << 1);
+                    widthSecret |= widthSecretBits[7];
+
+                    widthSecretIndex = 1;
+                }
+            } else {
+                heightSecretBits[heightSecretCounter] = red & 1;
+                heightSecretCounter ++;
+
+                if(heightSecretCounter%8 == 0){
+                    heightSecret = 0;
+                    heightSecret |= (heightSecretBits[0] << 7);
+                    heightSecret |= (heightSecretBits[1] << 6);
+                    heightSecret |= (heightSecretBits[2] << 5);
+                    heightSecret |= (heightSecretBits[3] << 4);
+                    heightSecret |= (heightSecretBits[4] << 3);
+                    heightSecret |= (heightSecretBits[5] << 2);
+                    heightSecret |= (heightSecretBits[6] << 1);
+                    heightSecret |= heightSecretBits[7];
+
+                    fprintf(hiddenFp, "%d %d\n", widthSecret, heightSecret);
+                    fprintf(hiddenFp, "255\n");
+                }
+            }
+        } else {
+            numberBits[numberBitCounter] = red & 1;
+            numberBitCounter ++;
+
+            if(numberBitCounter%8 == 0){
+                number = 0;
+                number |= (numberBits[0] << 7);
+                number |= (numberBits[1] << 6);
+                number |= (numberBits[2] << 5);
+                number |= (numberBits[3] << 4);
+                number |= (numberBits[4] << 3);
+                number |= (numberBits[5] << 2);
+                number |= (numberBits[6] << 1);
+                number |= numberBits[7];
+
+                fprintf(hiddenFp, "%d %d %d\n", number, number, number);
+                numberIndex ++;
+                if(numberIndex == widthSecret * heightSecret){          // END OF MESSAGE
+                    break;
+                }
+                numberBitCounter = 0;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(hiddenFp);
+    return;
 }
 
 // void createPPMgivenBase(char *filename, int multiplied){
