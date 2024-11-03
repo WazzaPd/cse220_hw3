@@ -359,6 +359,10 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
         fclose(encodedFp);
         return 0;
     }
+
+    fprintf(encodedFp, "P3\n");
+    fprintf(encodedFp, "%d %d\n", width, height);
+    fprintf(encodedFp, "255\n");
     
     //handle body
     int pixelIndex = 0;
@@ -386,7 +390,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
         if(pixelIndex < imageSize){
             if(j < 16){
                 if(widthCounter < 8){                                       //width encoding
-                    if((width >> (7 - widthCounter)) & 1){            // encode 1
+                    if((widthSecret >> (7 - widthCounter)) & 1){            // encode 1
                         red = red | 1;
                         green = green | 1;
                         blue = blue | 1;
@@ -397,7 +401,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
                     }
                     widthCounter++;
                 } else {                                                    // height encoding
-                    if((height >> (7 - heightCounter)) & 1){            // encode 1
+                    if((heightSecret >> (7 - heightCounter)) & 1){            // encode 1
                         red = red | 1;
                         green = green | 1;
                         blue = blue | 1;
@@ -408,7 +412,6 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
                     }
                     heightCounter++;
                 }
-                fprintf(encodedFp, "%d %d %d\n", red, green, blue);
             } else {
                 if(pixelIndex <= (imageSize)){                                  // color encoding (GRAY SCALE ONLY)
                     if((redSecret >> (7 - pixelBitCounter)) & 1){            // encode 1
@@ -432,15 +435,15 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
                         }
                     }
                 }
-                fprintf(encodedFp, "%d %d %d\n", red, green, blue);
             }
+            fprintf(encodedFp, "%d %d %d\n", red, green, blue);
         } else {
             fprintf(encodedFp, "%d %d %d\n", red, green, blue);
         }
     }
     fclose(fp);
     fclose(secretFp);
-    fclose (encodedFp);
+    fclose(encodedFp);
 
     return 1;
 }
