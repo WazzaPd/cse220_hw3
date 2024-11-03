@@ -272,7 +272,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 }
 
 char *reveal_message(char *input_filename) {
-    char * message = malloc(1);
+    char * message = NULL;
     FILE * fp = fopen(input_filename, "r");
 
     if (fp == NULL) {
