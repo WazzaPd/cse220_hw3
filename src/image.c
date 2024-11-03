@@ -1,6 +1,6 @@
 #include "image.h"
 
-int * handleHeader(FILE * fp){
+void handleHeader(FILE * fp, int * dimensions){
     char line[256];
     char c[2];
     // handle header
@@ -35,10 +35,9 @@ int * handleHeader(FILE * fp){
     int width = atoi(widthS);
     int height = atoi(heightS);
 
-    int *dimensions = malloc(sizeof(int) * 2);
     dimensions[0] = width;
     dimensions[1] = height;
-    return dimensions;
+    return;
 }
 
 void nextColor(Color * color){
@@ -84,7 +83,8 @@ Image *load_image(char *filename) {
     p->red = p->green = p->blue = NULL;  // Initialize to NULL
 
     //handle header
-    int * dimensions = handleHeader(fp);
+    int * dimensions = malloc(sizeof(int) * 2);
+    handleHeader(fp, dimensions);
     int width = dimensions[0];
     int height = dimensions[1];
     free(dimensions);
@@ -168,10 +168,10 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
         return 0;
     }
 
-    int * dimensions = handleHeader(fp);
+    int * dimensions = malloc(sizeof(int) * 2);
+    handleHeader(fp, dimensions);
     int width = dimensions[0];
     int height = dimensions[1];
-
     free(dimensions);
 
     fprintf(newFile, "P3\n");
@@ -281,10 +281,10 @@ char *reveal_message(char *input_filename) {
     }
 
     //handle header
-    int * dimensions = handleHeader(fp);
+    int * dimensions = malloc(sizeof(int) * 2);
+    handleHeader(fp, dimensions);
     int width = dimensions[0];
     int height = dimensions[1];
-
     free(dimensions);
 
     //handle body
@@ -343,15 +343,18 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
         return 0;
     }
 
-    int * dimensions = handleHeader(secretFp);
+    int * dimensions = malloc(sizeof(int) * 2);
+    handleHeader(secretFp, dimensions);
     int widthSecret = dimensions[0];
     int heightSecret = dimensions[1];
-
-    dimensions = handleHeader(fp);
-    int width = dimensions[0];
-    int height = dimensions[1];
-
     free(dimensions);
+
+    int * dimensions2 = malloc(sizeof(int) * 2);
+    handleHeader(fp, dimensions2);
+    int width = dimensions2[0];
+    int height = dimensions2[1];
+    free(dimensions2);
+
 
     if(widthSecret*heightSecret > ((width*height)/8) - 16){
         fclose(secretFp);
@@ -461,10 +464,10 @@ void reveal_image(char *input_filename, char *output_filename) {
         return;
     }
 
-    int * dimensions = handleHeader(fp);
+    int * dimensions = malloc(sizeof(int) * 2);
+    handleHeader(fp, dimensions);
     int width = dimensions[0];
     int height = dimensions[1];
-
     free(dimensions);
 
     fprintf(hiddenFp, "P3\n");
